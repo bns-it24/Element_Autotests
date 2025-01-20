@@ -382,3 +382,4 @@ def test_multipage_reservation(driver):
 
 def test_hotkeys(driver):
     hotkeys_Alt_S_E_X(driver)
+
