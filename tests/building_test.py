@@ -104,6 +104,7 @@ def fillling_required_fields_2nd_str (driver):
 def save_reservation (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonSave")
 
+
 def cancel_1st_res_string (driver):
     click_element(driver, By.ID, "__item3-__xmlview2--homeMainTable-0-cell0")  # Выбор нужной строки
     click_element(driver, By.ID, "__xmlview2--idHomeButtonCancel")  # Нажатие кнопки "Cancel"
@@ -1042,6 +1043,113 @@ def hotkeys_ctrl_d_y(driver):
     #Очистка конфигуратора бронирования
     clear_home_page(driver)
 
+
+def hotkeys_alt_v(driver):
+    driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
+
+    add_new_res_string(driver)
+
+    select_hotel_1st_str(driver)
+
+    fillling_required_fields_1st_str(driver)
+
+    save_reservation(driver)
+
+    sleep(2)
+
+    edit_mode_on(driver)
+
+    # Продление брони - добавление новой строки (добавленная строка содержит все данные из первой строки, НО дата заезда новой строки = дата выезда предыдущей строки)
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
+    body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
+    body.send_keys(Keys.ALT, 'v')  # Отправка Alt + V
+
+    # Проверка статуса после продления
+    res_status_1st_str = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
+    ).get_attribute('value')
+    assert res_status_1st_str == "SAVED", f"Expected SAVED, but got {res_status_1st_str}"
+
+    res_status_1st_str = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-1-inner"))
+    ).get_attribute('value')
+    assert res_status_1st_str == "NEW", f"Expected NEW, but got {res_status_1st_str}"
+
+    # Проверка флага Itin
+    try:
+        # Ожидание доступности чек-бокса
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "__box0-__xmlview2--homeMainTable-0-CB"))
+        )
+
+        # Получение элемента чекбокса
+        checkbox = driver.find_element(By.ID, "__box0-__xmlview2--homeMainTable-0-CB")
+
+        # Проверка, что чекбокс включен
+        is_checked = checkbox.is_selected()
+        assert is_checked, f"Чекбокс 'Itin' не включен."
+
+        print("Чекбокс 'Itin' включен.")
+
+    except TimeoutException:
+        print(f"Чекбокс 'Itin' не найден")
+    except AssertionError as e:
+        print(e)
+
+    # Проверка, что дата заезда новой строки = дата выезда предыдущей строки
+    try:
+        # Ожидание, пока оба инпута дат станут доступными
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "__picker1-__xmlview2--homeMainTable-0-inner"))
+        )
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "__picker0-__xmlview2--homeMainTable-1-inner"))
+        )
+
+        # Получение значений из инпутов и их сравнение
+        value1 = driver.find_element(By.ID, "__picker1-__xmlview2--homeMainTable-0-inner").get_attribute('value')
+        value2 = driver.find_element(By.ID, "__picker0-__xmlview2--homeMainTable-1-inner").get_attribute('value')
+
+        assert value1 == value2, f"Значения дат отъезда/заезда не совпадают: '{value1}' != '{value2}'"
+        print("Значения дат отъезда/заезда совпадают.")
+
+    except TimeoutException:
+        print("Один из инпутов дат не найден в течение 10 секунд.")
+    except AssertionError as e:
+        print(e)
+
+    save_reservation(driver)
+
+    check_saving_reservation(driver)
+
+    cancel_2nd_res_string(driver)
+
+    check_cancelling_reservation(driver)
+
+    # Проверка, что флаг Itin выключается
+    try:
+        # Ожидание доступности чек-бокса
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "__box0-__xmlview2--homeMainTable-0-CB"))
+        )
+
+        # Получение элемента чек-бокса
+        checkbox = driver.find_element(By.ID, "__box0-__xmlview2--homeMainTable-0-CB")
+
+        # Проверка, что чекбокс выключен
+        is_checked = checkbox.is_selected()
+        assert not is_checked, f"Чекбокс 'Itin' не выключен."
+
+        print("Чекбокс 'Itin' выключен.")
+
+    except TimeoutException:
+        print(f"Чекбокс 'Itin' не найден")
+    except AssertionError as e:
+        print(e)
+
+    cancel_1st_res_string(driver)
+
+    clear_home_page(driver)
 
 def test_onepage_res_payment_types(driver):  # Проверка сохранения/удаления брони, типов оплаты
     add_one_res_string(  # Простое бронирование в одну строку с оплатой картой
