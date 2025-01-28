@@ -581,7 +581,7 @@ def hotkeys_alt_i(driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonClear-inner")  # Нажатие кнопки "Clear"
 
 
-def hotkeys_alt_n_h (driver):
+def hotkeys_alt_n_h(driver):
     driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
 
     sleep(5) # Ожидание перед добавлением строки
@@ -682,7 +682,7 @@ def hotkeys_alt_n_h (driver):
     clear_home_page(driver)
 
 
-def hotkeys_alt_d (driver):
+def hotkeys_alt_d_y(driver):
     driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
 
     add_new_res_string(driver)
@@ -706,13 +706,13 @@ def hotkeys_alt_d (driver):
 
         # Проверка, что значение является числом
         if text_value.isdigit():
-            print("Элемент содержит числовое значение.")
+            print("Cnf nmb содержит числовое значение.")
         else:
             raise AssertionError(f"Не числовое значение: '{text_value}'")
 
         # Обработка исключений
     except TimeoutException:
-        print("Элемент с id='__link0' не найден в течение 10 секунд.")
+        print("Cnf nmb не найден в течение 10 секунд.")
     except NoSuchElementException:
         print("Элемент не найден.")
     except AssertionError as e:
@@ -725,7 +725,7 @@ def hotkeys_alt_d (driver):
     body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
     body.send_keys(Keys.ALT, 'd')  # Отправка Alt + D
 
-    # Проверка статусов после добавления
+    # Проверка статусов после копирования
     res_status_1st_str = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
     ).get_attribute('value')
@@ -735,8 +735,6 @@ def hotkeys_alt_d (driver):
         EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-1-inner"))
     ).get_attribute('value')
     assert res_status_2nd_str == "NEW", f"Expected NEW, but got {res_status_2nd_str}"
-
-    fillling_required_fields_2nd_str(driver)
 
     # Сохранение брони
     save_reservation(driver)
@@ -842,7 +840,10 @@ def hotkeys_alt_d (driver):
     ).get_attribute('value')
     assert res_status_2nd_str == "SAVED", f"Expected SAVED, but got {res_status_2nd_str}"
 
-    # Удаление брони
+    # Включение режима редактирования
+    edit_mode_on(driver)
+
+    # Закрытие брони
     cancel_1st_res_string(driver)
     cancel_2nd_res_string(driver)
 
@@ -874,6 +875,171 @@ def hotkeys_alt_d (driver):
         except AssertionError as e:
             print(e)
 
+    clear_home_page(driver)
+
+
+def hotkeys_ctrl_d_y(driver):
+    driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
+
+    add_new_res_string(driver)
+
+    select_hotel_1st_str(driver)
+
+    fillling_required_fields_1st_str(driver)
+
+    save_reservation(driver)
+
+    # Проверка присвоения брони Cnf Nmb
+    try:
+        # Ожидание, пока элемент станет доступен
+        element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__link0"))
+        )
+
+        # Извлечение текстового содержимого элемента
+        text_value = element.text
+        print(f"Значение в элементе: '{text_value}'")
+
+        # Проверка, что значение является числом
+        if text_value.isdigit():
+            print("Cnf nmb содержит числовое значение.")
+        else:
+            raise AssertionError(f"Не числовое значение: '{text_value}'")
+
+        # Обработка исключений
+    except TimeoutException:
+        print("Cnf nmb не найден в течение 10 секунд.")
+    except NoSuchElementException:
+        print("Элемент не найден.")
+    except AssertionError as e:
+        print(e)
+
+    edit_mode_on(driver)
+
+    # Копирование брони с теми же данными, но без Cnf nmb и со статусом "NEW"
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
+    body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
+    body.send_keys(Keys.CONTROL, 'd')  # Отправка Ctrl + D
+
+    # Проверка, что Cnf Nmb не присваивается брони
+    try:
+        # Поиск контейнера с cnf nmb
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__link0"))
+        )
+        # Если элемент был найден
+        raise AssertionError("Ошибка - Cnf Nmb был найден на странице")
+    except TimeoutException:
+        # Если возникла TimeoutException, элемент не был найден вовремя, что и требуется
+        print("Успех - Cnf Nmb не найден на странице")
+    except NoSuchElementException:
+        # Это исключение может возникнуть, если элемент никогда не существовал
+        print("Успех - Cnf Nmb не найден на странице")
+
+    # Проверка статуса после копирования
+    res_status_1st_str = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
+    ).get_attribute('value')
+    assert res_status_1st_str == "NEW", f"Expected NEW, but got {res_status_1st_str}"
+
+    # Сохранение новой брони
+    save_reservation(driver)
+
+    # Проверка успешного сохранения
+    check_saving_reservation(driver)
+
+    # Включение режима редактирования
+    edit_mode_on(driver)
+
+    # Закрытие брони
+    cancel_1st_res_string(driver)
+
+    sleep(2)
+
+    #Очистка конфигуратора бронирования
+    clear_home_page(driver)
+
+    # Добавление новой строки бронирования
+    add_new_res_string(driver)
+
+    select_hotel_1st_str(driver)
+
+    fillling_required_fields_1st_str(driver)
+
+    save_reservation(driver)
+
+    # Проверка присвоения брони Cnf Nmb
+    try:
+        # Ожидание, пока элемент станет доступен
+        element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__link0"))
+        )
+
+        # Извлечение текстового содержимого элемента
+        text_value = element.text
+        print(f"Значение в элементе: '{text_value}'")
+
+        # Проверка, что значение является числом
+        if text_value.isdigit():
+            print("Cnf nmb содержит числовое значение.")
+        else:
+            raise AssertionError(f"Не числовое значение: '{text_value}'")
+
+        # Обработка исключений
+    except TimeoutException:
+        print("Cnf nmb не найден в течение 10 секунд.")
+    except NoSuchElementException:
+        print("Элемент не найден.")
+    except AssertionError as e:
+        print(e)
+
+    edit_mode_on(driver)
+
+    # Копирование брони с теми же данными, НО без Cnf nmb, без платежных данных (HOLD) и со статусом "NEW"
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
+    body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
+    body.send_keys(Keys.CONTROL, 'y')  # Отправка Ctrl + Y
+
+    # Проверка, что Cnf Nmb не присваивается брони
+    try:
+        # Поиск контейнера с cnf nmb
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__link0"))
+        )
+        # Если элемент был найден
+        raise AssertionError("Ошибка - Cnf Nmb был найден на странице")
+    except TimeoutException:
+        # Если возникла TimeoutException, элемент не был найден вовремя, что и требуется
+        print("Успех - Cnf Nmb не найден на странице")
+    except NoSuchElementException:
+        # Это исключение может возникнуть, если элемент никогда не существовал
+        print("Успех - Cnf Nmb не найден на странице")
+
+    # Проверка статуса после копирования
+    res_status_1st_str = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
+    ).get_attribute('value')
+    assert res_status_1st_str == "NEW", f"Expected NEW, but got {res_status_1st_str}"
+
+    # Заполнение платежных данных (поле HOLD)
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner", "CA")
+
+    # Сохранение новой брони
+    save_reservation(driver)
+
+    # Проверка успешного сохранения
+    check_saving_reservation(driver)
+
+    # Включение режима редактирования
+    edit_mode_on(driver)
+
+    # Закрытие брони
+    cancel_1st_res_string(driver)
+
+    # Проверка закрытия
+    check_cancelling_reservation(driver)
+
+    #Очистка конфигуратора бронирования
     clear_home_page(driver)
 
 
