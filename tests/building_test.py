@@ -776,6 +776,8 @@ def hotkeys_alt_d_y(driver):
     except AssertionError as e:
         print(e)
 
+    sleep(2) # Ожидание перед включением редактирования
+
     edit_mode_on(driver)
 
     # Копирование брони с теми же данными, но со статусом "NEW"
@@ -1487,11 +1489,25 @@ def test_onepage_res_payment_types(driver):  # Проверка сохранен
 def test_multipage_reservation(driver):
     add_three_res_strings(driver)
 
-def test_hotkeys(driver):
-    hotkeys_alt_i(driver)
-    hotkeys_alt_s_e_x(driver)
-    hotkeys_alt_n_h(driver)
-    hotkeys_alt_d_y(driver)
-    hotkeys_alt_v(driver)
-    hotkeys_alt_k(driver)
-    hotkeys_ctrl_e_g_a(driver)
+
+def test_hotkeys():
+    test_functions = [
+        hotkeys_alt_i,
+        hotkeys_alt_s_e_x,
+        hotkeys_alt_n_h,
+        hotkeys_alt_d_y,
+        hotkeys_alt_v,
+        hotkeys_alt_k,
+        hotkeys_ctrl_e_g_a
+    ]
+
+    for function in test_functions:
+        driver = webdriver.Chrome()  # Создание новой сессии браузера (после каждого теста)
+        driver.maximize_window()  # Включение полноэкранного отображения браузера
+        try:
+            function(driver)  # Вызов функции
+            print(f"Тест '{function.__name__}' прошел успешно.")
+        except Exception as e:  # Поймать любое исключение
+            print(f"Ошибка при выполнении теста '{function.__name__}': {e}")
+        finally:
+            driver.quit()  # Закрытие сессии браузера (после каждого теста) независимо от результата
