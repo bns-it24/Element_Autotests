@@ -55,6 +55,10 @@ def check_adding_new_res_string(driver):
         print(f)
 
 
+def get_link(driver):
+    driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
+
+
 def add_new_res_string (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonAdd")
 
@@ -1345,6 +1349,90 @@ def hotkeys_alt_k(driver):
 
     clear_home_page(driver)
 
+
+def test_hotkeys_ctrl_e_g_a(driver):
+
+    get_link(driver)
+
+    # Открытие окна поиска бронирований ('Get Reservation')
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__container0")))
+    body = driver.find_element(By.ID, "__container0")  # Фокус на странице
+    body.send_keys(Keys.CONTROL, 'e')  # Отправка Ctrl + E
+
+    # Проверка отображения окна 'Get Reservation'
+    try:
+        # Ожидание, пока элемент станет доступным
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__xmlview2--idGetReservationDlg"))
+        )
+
+        # Если элемент найден, можно выполнить дополнительные действия или просто вывести сообщение
+        print(f"Окно 'Get Reservation' отображается на странице")
+
+    except TimeoutException:
+        # Если элемент не найден за отведенное время
+        print(f"Окно 'Get Reservation' НЕ отображается на странице")
+    except AssertionError as e:
+        print(e)
+
+    # Закрытие окна поиска бронирований ('Get Reservation')
+    click_element(driver, By.ID, "__button10-BDI-content")
+
+    sleep(1)
+
+    # Открытие окна поиска гостей ('Guest Lookup')
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__container0")))
+    body = driver.find_element(By.ID, "__container0")  # Фокус на странице
+    body.send_keys(Keys.CONTROL, 'g')  # Отправка Ctrl + G
+
+    sleep(1)
+
+    # Проверка отображения окна 'Guest Lookup'
+    try:
+        # Ожидание, пока элемент станет доступным
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__xmlview2--idGuestLookupDlg"))
+        )
+
+        # Если элемент найден, можно выполнить дополнительные действия или просто вывести сообщение
+        print(f"Окно 'Guest Lookup' отображается на странице")
+
+    except TimeoutException:
+        # Если элемент не найден за отведенное время
+        print(f"Окно 'Guest Lookup' НЕ отображается на странице")
+    except AssertionError as e:
+        print(e)
+
+    # Закрытие окна поиска гостей ('Guest Lookup')
+    click_element(driver, By.ID, "__button13-BDI-content")
+
+    sleep(1)
+
+    # Открытие окна поиска доступного бронирования ('Availability')
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__container0")))
+    body = driver.find_element(By.ID, "__container0")  # Фокус на странице
+    body.send_keys(Keys.CONTROL, 'a')  # Отправка Ctrl + A
+
+    sleep(1)
+
+    # Проверка отображения окна 'Availability'
+    try:
+        # Ожидание, пока элемент станет доступным
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "__xmlview2--idAvailabilityDlg"))
+        )
+
+        # Если элемент найден, можно выполнить дополнительные действия или просто вывести сообщение
+        print(f"Окно 'Availability' отображается на странице")
+
+    except TimeoutException:
+        # Если элемент не найден за отведенное время
+        print(f"Окно 'Availability' НЕ отображается на странице")
+    except AssertionError as e:
+        print(e)
+
+    # Закрытие окна поиска доступного бронирования ('Availability')
+    click_element(driver, By.ID, "__button14-BDI-content")
 
 def test_onepage_res_payment_types(driver):  # Проверка сохранения/удаления брони, типов оплаты
     add_one_res_string(  # Простое бронирование в одну строку с оплатой картой
