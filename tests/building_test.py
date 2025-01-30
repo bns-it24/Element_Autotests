@@ -73,9 +73,26 @@ def select_hotel_2nd_str(driver):
     click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
 
 
-def fillling_required_fields_1st_str (driver):
+def fillling_required_fields_1st_str_via2rooms (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 2)  # Кол-во комнат
+    send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 1)  # Взрослые
+    send_keys_to_element(driver, By.ID, "__input2-__xmlview2--homeMainTable-0-inner", 1)  # Дети
+    send_keys_to_element(driver, By.ID, "__input3-__xmlview2--homeMainTable-0-inner", "RAC")  # Категория гостя
+    send_keys_to_element(driver, By.ID, "__input4-__xmlview2--homeMainTable-0-inner", "RACK")  # Тариф
+    send_keys_to_element(driver, By.ID, "__input5-__xmlview2--homeMainTable-0-inner", "KING")  # Тип комнаты
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner", "VS 1111222233334444 0825")  # Платежные данные
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName_G-inner", generate_guest_name())  # Имя гостя
+    click_element(driver, By.ID, "__form1--FC-NoHead--Grid-wrapperfor-__xmlview2--selectCountry_G")  # Открыть список стран
+    click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
+
+
+
+def fillling_required_fields_1st_str (driver):
+    send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
+    send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 1)  # Кол-во комнат
     send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 1)  # Взрослые
     send_keys_to_element(driver, By.ID, "__input2-__xmlview2--homeMainTable-0-inner", 1)  # Дети
     send_keys_to_element(driver, By.ID, "__input3-__xmlview2--homeMainTable-0-inner", "RAC")  # Категория гостя
@@ -1200,7 +1217,7 @@ def hotkeys_alt_k(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    fillling_required_fields_1st_str_via2rooms (driver)
 
     save_reservation(driver)
 
@@ -1350,7 +1367,7 @@ def hotkeys_alt_k(driver):
     clear_home_page(driver)
 
 
-def test_hotkeys_ctrl_e_g_a(driver):
+def hotkeys_ctrl_e_g_a(driver):
 
     get_link(driver)
 
@@ -1434,6 +1451,8 @@ def test_hotkeys_ctrl_e_g_a(driver):
     # Закрытие окна поиска доступного бронирования ('Availability')
     click_element(driver, By.ID, "__button14-BDI-content")
 
+
+
 def test_onepage_res_payment_types(driver):  # Проверка сохранения/удаления брони, типов оплаты
     add_one_res_string(  # Простое бронирование в одну строку с оплатой картой
         driver,
@@ -1472,3 +1491,7 @@ def test_hotkeys(driver):
     hotkeys_alt_i(driver)
     hotkeys_alt_s_e_x(driver)
     hotkeys_alt_n_h(driver)
+    hotkeys_alt_d_y(driver)
+    hotkeys_alt_v(driver)
+    hotkeys_alt_k(driver)
+    hotkeys_ctrl_e_g_a(driver)
