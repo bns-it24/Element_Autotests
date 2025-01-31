@@ -78,6 +78,11 @@ def select_hotel_3rd_str(driver):
     click_element(driver, By.ID, "__item2-__select0-__xmlview2--homeMainTable-2-1")
 
 
+def select_custom_country(driver, country):
+    # Клик по выбранной стране, используя f-строку для корректного подстановки
+    click_element(driver, By.XPATH, f"//*[text()='{country}']")
+
+
 def fillling_required_fields_1st_str_via2rooms (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 2)  # Кол-во комнат
@@ -227,15 +232,14 @@ def edit_mode_on (driver):
     body.send_keys(Keys.ALT, 'e')  # Отправка Alt + E
 
 
-def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, contact_name, booking_source):
+def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
     get_link(driver)
 
     # Добавление новой строки бронирования
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonAdd")
+    add_new_res_string(driver)
 
     # Выбор отеля
-    click_element(driver, By.ID, "__select0-__xmlview2--homeMainTable-0-label")
-    click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
+    select_hotel_1st_str(driver)
 
     # Заполнение полей
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", str(arrival_date))  # Дата заезда
@@ -248,7 +252,7 @@ def run_one_custom_res_string(driver, arrival_date, room_count, adults, children
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner", payment_info)  # Платежные данные
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName_G-inner", guest_name)  # Имя гостя
     click_element(driver, By.ID, "__form1--FC-NoHead--Grid-wrapperfor-__xmlview2--selectCountry_G")  # Открыть список стран
-    click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
+    select_custom_country(driver, country)  # Выбрать страну
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", contact_name)  # Имя для связи
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner",booking_source)  # Тип источника бронирования
 
@@ -256,43 +260,37 @@ def run_one_custom_res_string(driver, arrival_date, room_count, adults, children
     res_status_before_save = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
     ).get_attribute('value')
-    assert res_status_before_save == "NEW", f"Expected NEW, but got {res_status_before_save}"
+    assert res_status_before_save == "NEW", f"Ожидаемый статус - NEW, фактический статус - {res_status_before_save}"
 
     # Сохранение брони
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonSave")
+    save_reservation(driver)
 
     # Проверка на успешное сохранение
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, "//*[text()='The data is saved']"))
-    )
+    check_saving_reservation(driver)
 
     # Проверка статуса после сохранения
     res_status_after_save = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
     ).get_attribute('value')
-    assert res_status_after_save == "SAVED", f"Expected SAVED, but got {res_status_after_save}"
+    assert res_status_after_save == "SAVED", f"Ожидаемый статус - SAVED, фактический статус - {res_status_after_save}"
 
     # Включение режима редактирования
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-    body = driver.find_element(By.TAG_NAME, "body")  # Фокус на <body>
-    body.send_keys(Keys.ALT, 'e')  # Отправка Alt + E
+    edit_mode_on(driver)
 
     # Закрытие сохраненной брони
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonCancel")  # Нажатие кнопки "Cancel"
+    cancel_1st_res_string(driver)
 
     # Проверка на успешное закрытие
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, "//*[text()='The reservation has been successfully cancelled']"))
-    )
+    check_cancelling_reservation(driver)
 
     # Проверка статуса после закрытия
     res_status_after_cancel = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, "__input7-__xmlview2--homeMainTable-0-inner"))
     ).get_attribute('value')
-    assert res_status_after_cancel == "CANCELLED", f"Expected CANCELLED, but got {res_status_after_cancel}"
+    assert res_status_after_cancel == "CANCELLED", f"Ожидаемый статус - CANCELLED, фактический статус - {res_status_after_cancel}"
 
     # Очистка конфигуратора бронирования
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonClear-inner")  # Нажатие кнопки "Clear"
+    clear_home_page(driver)
 
 
 def run_three_res_strings(driver):
@@ -419,26 +417,13 @@ def hotkeys_alt_s_e_x(driver):
     get_link(driver)
 
     # Добавление строки бронирования
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonAdd")
+    add_new_res_string(driver)
 
     # Выбор отеля
-    click_element(driver, By.ID, "__select0-__xmlview2--homeMainTable-0-label")
-    click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
+    select_hotel_1st_str(driver)
 
     # Заполнение полей
-    send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
-    send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 1)  # Кол-во комнат
-    send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 2)  # Взрослые
-    send_keys_to_element(driver, By.ID, "__input2-__xmlview2--homeMainTable-0-inner", 1)  # Дети
-    send_keys_to_element(driver, By.ID, "__input3-__xmlview2--homeMainTable-0-inner", "RAC")  # Категория гостя
-    send_keys_to_element(driver, By.ID, "__input4-__xmlview2--homeMainTable-0-inner", "RACK")  # Тариф
-    send_keys_to_element(driver, By.ID, "__input5-__xmlview2--homeMainTable-0-inner", "KING")  # Тип комнаты
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner","VS 1111222233334444 0825")  # Платежные данные
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName_G-inner", generate_guest_name())  # Имя гостя
-    click_element(driver, By.ID, "__form1--FC-NoHead--Grid-wrapperfor-__xmlview2--selectCountry_G")  # Открыть список стран
-    click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
+    fillling_required_fields_1st_str(driver)
 
     # Сохранение брони
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
@@ -462,15 +447,15 @@ def hotkeys_alt_s_e_x(driver):
     body = driver.find_element(By.TAG_NAME, "body")  # Фокус на <body>
     body.send_keys(Keys.ALT, 'e')  # Отправка Alt + E
 
-    # Отмена брони
+    # Закрытие брони
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
     body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
     body.send_keys(Keys.ALT, 'x')  # Отправка Alt + X
 
-    # Ожидание после удаления
+    # Ожидание после закрытия
     sleep(2)
 
-    # Проверка на успешное удаление
+    # Проверка на успешное закрытие
     try:
         success_message_element = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//*[text()='The reservation has been successfully cancelled']"))
@@ -480,7 +465,7 @@ def hotkeys_alt_s_e_x(driver):
         assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
 
     # Очистка конфигуратора бронирования
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonClear-inner")  # Нажатие кнопки "Clear"
+    clear_home_page(driver)
 
 
 def hotkeys_alt_i(driver):
@@ -490,52 +475,29 @@ def hotkeys_alt_i(driver):
     add_new_res_string (driver)
 
     # Выбор отеля
-    click_element(driver, By.ID, "__select0-__xmlview2--homeMainTable-0-label")
-    click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
+    select_hotel_1st_str(driver)
 
     # Заполнение полей
-    send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
-    send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 1)  # Кол-во комнат
-    send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 2)  # Взрослые
-    send_keys_to_element(driver, By.ID, "__input2-__xmlview2--homeMainTable-0-inner", 1)  # Дети
-    send_keys_to_element(driver, By.ID, "__input3-__xmlview2--homeMainTable-0-inner", "RAC")  # Категория гостя
-    send_keys_to_element(driver, By.ID, "__input4-__xmlview2--homeMainTable-0-inner", "RACK")  # Тариф
-    send_keys_to_element(driver, By.ID, "__input5-__xmlview2--homeMainTable-0-inner", "KING")  # Тип комнаты
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner","VS 1111222233334444 0825")  # Платежные данные
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName_G-inner", "FAT/OLEG/MR")  # Имя гостя
-    click_element(driver, By.ID,"__form1--FC-NoHead--Grid-wrapperfor-__xmlview2--selectCountry_G")  # Открыть список стран
-    click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
-    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
+    fillling_required_fields_1st_str_via2rooms(driver)
 
     # Сохранение брони
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
-    body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
-    body.send_keys(Keys.ALT, 's')  # Отправка Alt + S
+    save_reservation(driver)
 
     # Проверка на успешное сохранение
-    try:
-        success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The data is saved']"))
-        )
-        assert success_message_element.is_displayed(), "Сообщение об успешном сохранении не отображается."
-    except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном сохранении не обнаружено."
+    check_saving_reservation(driver)
 
     # Ожидание перед включением редактирования
     sleep(2)
 
     # Включение режима редактирования
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-    body = driver.find_element(By.TAG_NAME, "body")  # Фокус на <body>
-    body.send_keys(Keys.ALT, 'e')  # Отправка Alt + E
+    edit_mode_on(driver)
 
     # Внесение изменений в имя гостя
     element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "__xmlview2--homeTabInputName_G-inner")) # Поиск элемента
+        EC.presence_of_element_located((By.ID, "__xmlview2--homeTabInputName_G-inner")) # Поиск инпута
     )
     element.clear()  # Очистка поля ввода
-    element.send_keys("THIN/MARIA/MRS")  # Ввод данных
+    element.send_keys("THIN/MARIA/MRS")  # Ввод новых данных
 
     # Проверка ввода изменений
     try:
@@ -560,14 +522,14 @@ def hotkeys_alt_i(driver):
     # Подтверждение отмены изменений
     click_element(driver, By.ID, "__mbox-btn-0-BDI-content")
 
-    # Проверка сообщения об успехе
+    # Проверка сообщения об успешном изменении
     try:
         success_message_element = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//*[text()='The changes have been canceled']"))
         )
-        assert success_message_element.is_displayed(), "Сообщение об успешной отмене."
+        assert success_message_element.is_displayed(), "Сообщение об успешном изменении данных не отображается."
     except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешной отмене не обнаружено."
+        assert False, "Время ожидания истекло. Сообщение об успешном изменении данных не обнаружено."
 
     # Проверка отмены изменений
     try:
@@ -575,31 +537,24 @@ def hotkeys_alt_i(driver):
             EC.visibility_of_element_located((By.ID, "__xmlview2--homeTabInputName_G-inner"))
         )
         assert input_element.get_attribute(
-            'value') == "FAT/OLEG/MR", "Вводимое значение 'FAT/OLEG/MR' не отображается в поле."
+            'value') != "THIN/MARIA/MRS", "Ошибка: значение 'THIN/MARIA/MRS' отображается в поле 'Имя'."
+
     except TimeoutException:
         assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
     except AssertionError as ae:
         assert False, str(ae)
 
-    # Отмена брони
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
-    body = driver.find_element(By.ID, "__item3-__xmlview2--homeMainTable-0")  # Фокус на строку бронирования
-    body.send_keys(Keys.ALT, 'x')  # Отправка Alt + X
+    # Закрытие брони
+    cancel_1st_res_string(driver)
 
     # Ожидание после удаления
     sleep(2)
 
     # Проверка на успешное удаление
-    try:
-        success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The reservation has been successfully cancelled']"))
-        )
-        assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
-    except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
+    check_cancelling_reservation(driver)
 
     # Очистка конфигуратора бронирования
-    click_element(driver, By.ID, "__xmlview2--idHomeButtonClear-inner")  # Нажатие кнопки "Clear"
+    clear_home_page(driver)
 
 
 def hotkeys_alt_n_h(driver):
@@ -1418,7 +1373,7 @@ def hotkeys_ctrl_e_g_a(driver):
 
 
 
-def test_onepage_res_payment_types(driver):  # Проверка сохранения/удаления брони, типов оплаты
+def test_onepage_res(driver):  # Проверка сохранения/удаления брони, типов оплаты
     run_one_custom_res_string(  # Простое бронирование в одну строку с оплатой картой
         driver,
         arrival_date=date.today().strftime("%d%m%Y"),  # Ввод текущей даты в формате "24092024"
@@ -1430,6 +1385,7 @@ def test_onepage_res_payment_types(driver):  # Проверка сохранен
         room_type="KING",
         payment_info="VS 1111222233334444 0825",
         guest_name=generate_guest_name(),
+        country="USA",
         contact_name="BORIS",
         booking_source="K"
     )
@@ -1440,11 +1396,12 @@ def test_onepage_res_payment_types(driver):  # Проверка сохранен
         room_count=1,
         adults=2,
         children=0,
-        guest_category="RAC",
-        rate="RACK",
-        room_type="KING",
+        guest_category="AWD",
+        rate="SWAG",
+        room_type="TWIN",
         payment_info="CA",
         guest_name=generate_guest_name(),
+        country="Russian Federation",
         contact_name="ANTON",
         booking_source="K"
     )
