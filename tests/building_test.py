@@ -1372,7 +1372,6 @@ def hotkeys_ctrl_e_g_a(driver):
     click_element(driver, By.ID, "__button14-BDI-content")
 
 
-
 def test_onepage_res(driver):  # Проверка сохранения/удаления брони, типов оплаты
     run_one_custom_res_string(  # Простое бронирование в одну строку с оплатой картой
         driver,
