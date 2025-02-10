@@ -10,13 +10,14 @@ from datetime import date
 import random
 import string
 
-
-@pytest.fixture()
-def driver():
-    driver = webdriver.Chrome()
-    driver.maximize_window()  # Включение полноэкранного отображения браузера
-    yield driver
-    driver.quit()
+# Перенес фикстуру в conftest.py
+# @pytest.fixture()
+# def driver():
+#     driver = webdriver.Chrome()
+#     driver.maximize_window()  # Включение полноэкранного отображения браузера
+#     driver.implicitly_wait(2) # Замена слипу (будет автоматически ждать появление элемента 2 сек.)
+#     yield driver
+#     driver.quit()
 
 
 def click_element(driver, by, value):
@@ -83,7 +84,7 @@ def select_custom_country(driver, country):
     click_element(driver, By.XPATH, f"//*[text()='{country}']")
 
 
-def fillling_required_fields_1st_str_via2rooms (driver):
+def filling_required_fields_1st_str_via2rooms (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 2)  # Кол-во комнат
     send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 1)  # Взрослые
@@ -98,8 +99,24 @@ def fillling_required_fields_1st_str_via2rooms (driver):
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
 
+def filling_required_fields_1st_str_custom(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
 
-def fillling_required_fields_1st_str (driver):
+    send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", str(arrival_date))  # Дата заезда
+    send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", str(room_count))  # Кол-во комнат
+    send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", str(adults))  # Взрослые
+    send_keys_to_element(driver, By.ID, "__input2-__xmlview2--homeMainTable-0-inner", str(children))  # Дети
+    send_keys_to_element(driver, By.ID, "__input3-__xmlview2--homeMainTable-0-inner", guest_category)  # Категория гостя
+    send_keys_to_element(driver, By.ID, "__input4-__xmlview2--homeMainTable-0-inner", rate)  # Тариф
+    send_keys_to_element(driver, By.ID, "__input5-__xmlview2--homeMainTable-0-inner", room_type)  # Тип комнаты
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputHold_G-inner", payment_info)  # Платежные данные
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName_G-inner", guest_name)  # Имя гостя
+    click_element(driver, By.ID, "__form1--FC-NoHead--Grid-wrapperfor-__xmlview2--selectCountry_G")  # Открыть список стран
+    select_custom_country(driver, country)  # Выбрать страну
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", contact_name)  # Имя для связи
+    send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner",booking_source)  # Тип источника бронирования
+
+
+def filling_required_fields_1st_str (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-0-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-0-inner", 1)  # Кол-во комнат
     send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-0-inner", 1)  # Взрослые
@@ -115,7 +132,7 @@ def fillling_required_fields_1st_str (driver):
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
 
 
-def fillling_required_fields_2nd_str (driver):
+def filling_required_fields_2nd_str (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-1-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-1-inner", 1)  # Кол-во комнат
     send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-1-inner", 1)  # Взрослые
@@ -131,7 +148,7 @@ def fillling_required_fields_2nd_str (driver):
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "H")  # Тип источника бронирования
 
 
-def fillling_required_fields_3rd_str (driver):
+def filling_required_fields_3rd_str (driver):
     send_keys_to_element(driver, By.ID, "__picker0-__xmlview2--homeMainTable-2-inner", date.today().strftime("%d%m%Y"))  # Дата заезда
     send_keys_to_element(driver, By.ID, "__input0-__xmlview2--homeMainTable-2-inner", 1)  # Кол-во комнат
     send_keys_to_element(driver, By.ID, "__input1-__xmlview2--homeMainTable-2-inner", 1)  # Взрослые
@@ -149,6 +166,14 @@ def fillling_required_fields_3rd_str (driver):
 
 def save_reservation (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonSave")
+
+
+def add_and_save_1_res_str(driver):
+    get_link(driver)
+    add_new_res_string(driver)
+    select_hotel_1st_str(driver)
+    filling_required_fields_1st_str(driver)
+    save_reservation(driver)
 
 
 def cancel_1st_res_string (driver):
@@ -303,7 +328,7 @@ def run_three_res_strings(driver):
     select_hotel_1st_str(driver)
 
     # Заполнение полей
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     # Сохранение брони
     save_reservation(driver)
@@ -321,7 +346,7 @@ def run_three_res_strings(driver):
     select_hotel_2nd_str(driver)
 
     # Заполнение полей
-    fillling_required_fields_2nd_str(driver)
+    filling_required_fields_2nd_str(driver)
 
     # Сохранение брони
     save_reservation(driver)
@@ -339,7 +364,7 @@ def run_three_res_strings(driver):
     select_hotel_3rd_str(driver)
 
     # Заполнение полей
-    fillling_required_fields_3rd_str(driver)
+    filling_required_fields_3rd_str(driver)
 
     # Проверка статуса перед сохранением
     # Список ID элементов для проверки (1-2 строки)
@@ -413,6 +438,87 @@ def run_three_res_strings(driver):
     clear_home_page(driver)
 
 
+def test_save_changed_reservation(driver):
+    add_and_save_1_res_str(driver)
+
+    check_saving_reservation(driver)
+
+    # # Получение cnf nmb до выделения брони
+    # cnf_number_before = driver.find_element(By.ID, cnf_number_id).text
+    # print(f"Cnf nmb ДО выделения: {cnf_number_before}")
+
+    edit_mode_on(driver)
+
+    filling_required_fields_1st_str_custom(
+        driver,
+        arrival_date=date.today().strftime("%d%m%Y"),
+        room_count=3,
+        adults=4,
+        children=2,
+        guest_category="GTA",
+        rate="SWAG",
+        room_type="TWIN",
+        payment_info="CA",
+        guest_name="FILIPPI/GEORG/MR",
+        country="USA",
+        contact_name="TOMMY",
+        booking_source="T"
+    )
+
+    save_reservation(driver)
+
+    check_saving_reservation(driver)
+
+    # Проверка добавления изменений
+    fields_to_check = [
+        ("__input0-__xmlview2--homeMainTable-0-inner", 3, "Ошибка: поле 'Количество комнат' не было изменено."),
+        ("__input1-__xmlview2--homeMainTable-0-inner", 4, "Ошибка: поле 'Взрослые' не было изменено."),
+        ("__input2-__xmlview2--homeMainTable-0-inner", 1, "Ошибка: поле 'Дети' не было изменено."),
+        ("__input3-__xmlview2--homeMainTable-0-inner", "GTA", "Ошибка: поле 'Категория гостя' не было изменено."),
+        ("__input4-__xmlview2--homeMainTable-0-inner", "SWAG", "Ошибка: поле 'Тариф' не было изменено."),
+        ("__input5-__xmlview2--homeMainTable-0-inner", "TWIN", "Ошибка: поле 'Тип комнаты' не было изменено."),
+        ("__xmlview2--homeTabInputHold_G-inner", "CA", "Ошибка: поле 'Платежные данные' не было изменено."),
+        ("__xmlview2--homeTabInputName2_G-inner", "TOMMY", "Ошибка: поле 'Имя для связи' не было изменено."),
+        ("__xmlview2--homeTabInputBkngSrc_G-inner", "T", "Ошибка: поле 'Тип источника бронирования' не было изменено."),
+    ]
+
+    try:
+        for field_id, expected_value, error_message in fields_to_check:
+            element = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located((By.ID, field_id))
+            )
+            assert element.get_attribute('value') == expected_value, error_message
+
+    except TimeoutException:
+        assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
+    except AssertionError as ae:
+        assert False, str(ae)
+
+    # TODO добавить проверку действия в рамках 1 cnf nmb
+
+    # # Получение cnf nmb после выделения брони
+    # cnf_number_after = driver.find_element(By.ID, cnf_number_id).text
+    # print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
+    #
+    # # Получение room nmb из второй строки после выделения брони
+    # value_after = int(driver.find_element(By.ID, room_nmb_1_id).get_attribute('value'))
+    # print(f"Кол-во комнат во второй строке ПОСЛЕ выделения: {value_after}")
+    #
+    # # Проверка, совпадает ли значение cnf nmb
+    # assert cnf_number_before == cnf_number_after, "Cnf nmb изменился после выделения."
+    # print("CNF номер подтвержден, значения совпадают.")
+
+    edit_mode_on(driver)
+
+    sleep(2)
+
+    cancel_1st_res_string(driver)
+
+    check_cancelling_reservation(driver)
+
+    clear_home_page(driver)
+
+
 def hotkeys_alt_s_e_x(driver):
     get_link(driver)
 
@@ -423,7 +529,7 @@ def hotkeys_alt_s_e_x(driver):
     select_hotel_1st_str(driver)
 
     # Заполнение полей
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     # Сохранение брони
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "__item3-__xmlview2--homeMainTable-0")))
@@ -478,7 +584,7 @@ def hotkeys_alt_i(driver):
     select_hotel_1st_str(driver)
 
     # Заполнение полей
-    fillling_required_fields_1st_str_via2rooms(driver)
+    filling_required_fields_1st_str_via2rooms(driver)
 
     # Сохранение брони
     save_reservation(driver)
@@ -575,7 +681,7 @@ def hotkeys_alt_n_h(driver):
     click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
 
     # Заполнение обязательных полей
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     # Сохранение брони
     save_reservation(driver)
@@ -665,7 +771,7 @@ def hotkeys_alt_d_y(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     save_reservation(driver)
 
@@ -760,7 +866,7 @@ def hotkeys_alt_d_y(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     save_reservation(driver)
 
@@ -863,7 +969,7 @@ def hotkeys_ctrl_d_y(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     save_reservation(driver)
 
@@ -942,7 +1048,7 @@ def hotkeys_ctrl_d_y(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     save_reservation(driver)
 
@@ -1028,7 +1134,7 @@ def hotkeys_alt_v(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str(driver)
+    filling_required_fields_1st_str(driver)
 
     save_reservation(driver)
 
@@ -1137,7 +1243,7 @@ def hotkeys_alt_k(driver):
 
     select_hotel_1st_str(driver)
 
-    fillling_required_fields_1st_str_via2rooms (driver)
+    filling_required_fields_1st_str_via2rooms (driver)
 
     save_reservation(driver)
 
@@ -1185,7 +1291,7 @@ def hotkeys_alt_k(driver):
         value_after = int(driver.find_element(By.ID, room_nmb_1_id).get_attribute('value'))
         print(f"Кол-во комнат во второй строке ПОСЛЕ выделения: {value_after}")
 
-        # Проверка, совпадает ли значение nf nmb
+        # Проверка, совпадает ли значение cnf nmb
         assert cnf_number_before == cnf_number_after, "Cnf nmb изменился после выделения."
         print("CNF номер подтвержден, значения совпадают.")
 
