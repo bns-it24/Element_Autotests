@@ -2,6 +2,7 @@ from time import sleep
 import pytest
 from selenium import webdriver
 from selenium.common import TimeoutException, NoSuchElementException
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -9,6 +10,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import date
 import random
 import string
+from dateutil.relativedelta import relativedelta
+from tests.experimental_test import driver
+
 
 # Перенес фикстуру в conftest.py
 # @pytest.fixture()
@@ -24,6 +28,11 @@ def click_element(driver, by, value):
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((by, value))).click()
 
 
+def click_multiple_elements(driver, element_ids):
+    for element_id in element_ids:
+        click_element(driver, By.ID, element_id)
+
+
 def send_keys_to_element(driver, by, value, keys):
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((by, value))).click()  # Клик перед вводом
     element = WebDriverWait(driver, 10).until(
@@ -37,6 +46,18 @@ def generate_guest_name():  # Генерация рандомного имени
     part2 = ''.join(random.choices(string.ascii_uppercase, k=5))  # Генерация 5 случайных букв
     suffix = random.choice(["MR", "MRS"])  # Случайный выбор между MR и MRS
     return f"{part1}/{part2}/{suffix}"  # Формирование строки в требуемом формате
+
+
+def send_current_date(driver, element_id):
+    current_date = date.today()
+    formatted_date = current_date.strftime("%d%m%Y")
+    send_keys_to_element(driver, By.ID, element_id, formatted_date)
+
+
+def send_date_plus_12_months(driver, element_id):
+    future_date = date.today() + relativedelta(months=12)
+    formatted_date = future_date.strftime("%d%m%Y")
+    send_keys_to_element(driver, By.ID, element_id, formatted_date)
 
 
 def check_adding_new_res_string(driver):
@@ -56,8 +77,12 @@ def check_adding_new_res_string(driver):
         print(f)
 
 
+def to_homepage(driver):
+    click_element(driver, By.ID, "__xmlview3--HOME-BDI-content")
+
+
 def get_link(driver):
-    driver.get("https://reserve.kube.ugmk.com/webapp/index.html#/home")
+    driver.get("http://localhost:443/webapp/index.html#/home")
 
 
 def add_new_res_string (driver):
@@ -98,6 +123,7 @@ def filling_required_fields_1st_str_via2rooms (driver):
     click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
+
 
 def filling_required_fields_1st_str_custom(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
 
@@ -162,6 +188,55 @@ def filling_required_fields_3rd_str (driver):
     click_element(driver, By.XPATH, "//*[text()='Russian Federation']")  # Выбрать страну
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputName2_G-inner", "BILBO")  # Имя для связи
     send_keys_to_element(driver, By.ID, "__xmlview2--homeTabInputBkngSrc_G-inner", "B")  # Тип источника бронирования
+
+
+def filling_rate_required_fields(driver):
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_rate_code-__xmlview4--rate_manager1-0-inner", '1TEST1') # Rate code
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_rate_description-__xmlview4--rate_manager1-0-inner", '1TEST1') # Rate description
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_rate_category-__xmlview4--rate_manager1-0-label") # Select category list
+    click_element(driver, By.ID, "__item17-__xmlview4--rate_manager1-0-__xmlview4--rate_dialog_rate_category-__xmlview4--rate_manager1-0-2") # Select category
+    send_current_date(driver, "__xmlview4--rate_dialog_begin_sell_date-__xmlview4--rate_manager1-0-inner") # Begin sell date
+    send_date_plus_12_months(driver, "__xmlview4--rate_dialog_end_sell_date-__xmlview4--rate_manager1-0-inner")  # End sell date
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_market-__xmlview4--rate_manager1-0-label") # Select market list
+    click_element(driver, By.ID, "__item18-__xmlview4--rate_manager1-0-__xmlview4--rate_dialog_market-__xmlview4--rate_manager1-0-10") # Select market
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_source-__xmlview4--rate_manager1-0-label") # Select source list
+    click_element(driver, By.ID, "__item19-__xmlview4--rate_manager1-0-__xmlview4--rate_dialog_source-__xmlview4--rate_manager1-0-2") # Select source
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_room_type-__xmlview4--rate_manager1-0-arrow")  # Select room type list
+    click_element(driver, By.XPATH, "//*[text()='KING']")  # Select room type KING
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_room_type-__xmlview4--rate_manager1-0-arrow")  # Select room type list
+    click_element(driver, By.XPATH, "//*[text()='TWIN']") # Select room type TWIN
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_commission-__xmlview4--rate_manager1-0-inner", "777") # Add commission
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_adult_max-__xmlview4--rate_manager1-0-inner", "5") # Max adults
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_child_max-__xmlview4--rate_manager1-0-inner", "2") # Max children
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_trx_code-__xmlview4--rate_manager1-0-arrow")  # Select transaction code list
+    click_element(driver, By.ID, "__item21-__xmlview4--rate_manager1-0-__xmlview4--rate_dialog_trx_code-__xmlview4--rate_manager1-0-3")  # Select transaction code
+    click_element(driver, By.ID, "__xmlview4--rate_dialog_currency_code-__xmlview4--rate_manager1-0-arrow")  # Select currency code list
+    click_element(driver, By.ID, "__item22-__xmlview4--rate_manager1-0-__xmlview4--rate_dialog_currency_code-__xmlview4--rate_manager1-0-0")  # Select currency code
+    click_element(driver,By.ID, "__xmlview4--rate_dialog_cb_active-__xmlview4--rate_manager1-0-CbBg") # Active checkbox on
+    click_element(driver, By.ID, "__filter0-text")  # To rate details
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_stay_date_range-__xmlview4--rate_manager_date_ranges-0-inner", "01012025-31122025") # Arrival range
+    send_keys_to_element(driver, By.ID, "__xmlview4--rate_dialog_base_price-__xmlview4--rate_manager_date_ranges-0-inner", "777") # Base price
+    # Weekdays
+    element_ids = [
+        "__box26-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box27-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box28-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box29-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box30-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box31-__xmlview4--rate_manager_date_ranges-0-CbBg",
+        "__box32-__xmlview4--rate_manager_date_ranges-0-CbBg"
+    ]
+    click_multiple_elements(driver, element_ids)
+
+
+def search_rate(driver, element_id, input_value, button_id):
+    input_element = driver.find_element(By.ID, element_id)
+    input_element.clear()
+    input_element.send_keys(input_value)
+
+    button_element = driver.find_element(By.ID, button_id)
+    ActionChains(driver).move_to_element(button_element).click().perform()
+
 
 
 def save_reservation (driver):
@@ -251,14 +326,85 @@ def check_2nd_str_status_saved(driver):
     assert res_status_after_save == "SAVED", f"Expected SAVED, but got {res_status_after_save}"
 
 
+def check_deleting_rate(driver):
+    sleep(2)
+
+    body_text = driver.find_element(By.TAG_NAME, "body").text
+    try:
+        if "1TEST1" in body_text:
+            raise AssertionError("ОШИБКА: тариф не был удален")
+        elif "No data loaded" in body_text:
+            print("Тариф корректно удален")
+    except AssertionError as e:
+        print(e)
+
+
 def edit_mode_on (driver):
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     body = driver.find_element(By.TAG_NAME, "body")  # Фокус на <body>
     body.send_keys(Keys.ALT, 'e')  # Отправка Alt + E
 
 
-def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
+def open_rates(driver):
+    click_element(driver, By.ID, "__button0-internalBtn-BDI-content")
+
+    click_element(driver, By.XPATH, "//*[text()='Rates']")
+
+    click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label") # обратить внимание на смену переменных "xmlview"
+
+    click_element(driver, By.ID, "__item11-__xmlview4--rate_search_hotel-1")
+
+
+def test_add_new_rate(driver):
     get_link(driver)
+
+    open_rates(driver)
+
+    click_element(driver, By.ID, "__button8-inner") # Add new rate
+
+    sleep(8)
+
+    filling_rate_required_fields(driver)
+
+    click_element(driver, By.ID, "__button13-BDI-content") # Save
+
+    to_homepage(driver)
+
+    run_one_custom_res_string(
+        driver,
+        arrival_date=date.today().strftime("%d%m%Y"),
+        room_count=1,
+        adults=1,
+        children=0,
+        guest_category="RAC",
+        rate="1TEST1",
+        room_type="KING",
+        payment_info="VS 1111222233334444 0825",
+        guest_name=generate_guest_name(),
+        country="USA",
+        contact_name="BORIS",
+        booking_source="K"
+    )
+
+    open_rates(driver)
+
+    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
+
+    sleep(2)
+
+    click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
+
+    click_element(driver, By.ID, "__mbox-btn-2-BDI-content") # Access deleting
+
+    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
+
+    check_deleting_rate(driver)
+
+
+
+
+
+def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
 
     # Добавление новой строки бронирования
     add_new_res_string(driver)
@@ -443,9 +589,8 @@ def test_save_changed_reservation(driver):
 
     check_saving_reservation(driver)
 
-    # # Получение cnf nmb до выделения брони
-    # cnf_number_before = driver.find_element(By.ID, cnf_number_id).text
-    # print(f"Cnf nmb ДО выделения: {cnf_number_before}")
+    cnf_number_before = driver.find_element(By.ID, "__link0").text
+    print(f"Cnf nmb ДО выделения: {cnf_number_before}")
 
     edit_mode_on(driver)
 
@@ -469,7 +614,6 @@ def test_save_changed_reservation(driver):
 
     check_saving_reservation(driver)
 
-    # Проверка добавления изменений
     fields_to_check = [
         ("__input0-__xmlview2--homeMainTable-0-inner", 3, "Ошибка: поле 'Количество комнат' не было изменено."),
         ("__input1-__xmlview2--homeMainTable-0-inner", 4, "Ошибка: поле 'Взрослые' не было изменено."),
@@ -488,25 +632,17 @@ def test_save_changed_reservation(driver):
                 EC.visibility_of_element_located((By.ID, field_id))
             )
             assert element.get_attribute('value') == expected_value, error_message
-
+# TODO вывести ошибки в отдельные переменные
     except TimeoutException:
         assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
     except AssertionError as ae:
         assert False, str(ae)
 
-    # TODO добавить проверку действия в рамках 1 cnf nmb
+    cnf_number_after = driver.find_element(By.ID, "__link0").text
+    print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
 
-    # # Получение cnf nmb после выделения брони
-    # cnf_number_after = driver.find_element(By.ID, cnf_number_id).text
-    # print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
-    #
-    # # Получение room nmb из второй строки после выделения брони
-    # value_after = int(driver.find_element(By.ID, room_nmb_1_id).get_attribute('value'))
-    # print(f"Кол-во комнат во второй строке ПОСЛЕ выделения: {value_after}")
-    #
-    # # Проверка, совпадает ли значение cnf nmb
-    # assert cnf_number_before == cnf_number_after, "Cnf nmb изменился после выделения."
-    # print("CNF номер подтвержден, значения совпадают.")
+    assert cnf_number_before == cnf_number_after, "Cnf nmb изменился"
+    print("Cnf номер подтвержден, значения совпадают.")
 
     edit_mode_on(driver)
 
@@ -1479,9 +1615,10 @@ def hotkeys_ctrl_e_g_a(driver):
 
 
 def test_onepage_res(driver):  # Проверка сохранения/удаления брони, типов оплаты
-    run_one_custom_res_string(  # Простое бронирование в одну строку с оплатой картой
+    get_link(driver)
+    run_one_custom_res_string(
         driver,
-        arrival_date=date.today().strftime("%d%m%Y"),  # Ввод текущей даты в формате "24092024"
+        arrival_date=date.today().strftime("%d%m%Y"),
         room_count=1,
         adults=1,
         children=0,
@@ -1495,7 +1632,8 @@ def test_onepage_res(driver):  # Проверка сохранения/удал�
         booking_source="K"
     )
 
-    run_one_custom_res_string(  # Простое бронирование в одну строку с оплатой наличными
+    get_link(driver)
+    run_one_custom_res_string(
         driver,
         arrival_date=date.today().strftime("%d%m%Y"),
         room_count=1,
