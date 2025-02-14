@@ -1,5 +1,4 @@
 from time import sleep
-import pytest
 from selenium import webdriver
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
@@ -12,16 +11,6 @@ import random
 import string
 from dateutil.relativedelta import relativedelta
 from tests.experimental_test import driver
-
-
-# Перенес фикстуру в conftest.py
-# @pytest.fixture()
-# def driver():
-#     driver = webdriver.Chrome()
-#     driver.maximize_window()  # Включение полноэкранного отображения браузера
-#     driver.implicitly_wait(2) # Замена слипу (будет автоматически ждать появление элемента 2 сек.)
-#     yield driver
-#     driver.quit()
 
 
 def click_element(driver, by, value):
@@ -238,7 +227,6 @@ def search_rate(driver, element_id, input_value, button_id):
     ActionChains(driver).move_to_element(button_element).click().perform()
 
 
-
 def save_reservation (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonSave")
 
@@ -353,55 +341,6 @@ def open_rates(driver):
     click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label") # обратить внимание на смену переменных "xmlview"
 
     click_element(driver, By.ID, "__item11-__xmlview4--rate_search_hotel-1")
-
-
-def test_add_new_rate(driver):
-    get_link(driver)
-
-    open_rates(driver)
-
-    click_element(driver, By.ID, "__button8-inner") # Add new rate
-
-    sleep(8)
-
-    filling_rate_required_fields(driver)
-
-    click_element(driver, By.ID, "__button13-BDI-content") # Save
-
-    to_homepage(driver)
-
-    run_one_custom_res_string(
-        driver,
-        arrival_date=date.today().strftime("%d%m%Y"),
-        room_count=1,
-        adults=1,
-        children=0,
-        guest_category="RAC",
-        rate="1TEST1",
-        room_type="KING",
-        payment_info="VS 1111222233334444 0825",
-        guest_name=generate_guest_name(),
-        country="USA",
-        contact_name="BORIS",
-        booking_source="K"
-    )
-
-    open_rates(driver)
-
-    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
-
-    sleep(2)
-
-    click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
-
-    click_element(driver, By.ID, "__mbox-btn-2-BDI-content") # Access deleting
-
-    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
-
-    check_deleting_rate(driver)
-
-
-
 
 
 def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
@@ -583,7 +522,7 @@ def run_three_res_strings(driver):
     # Очистка конфигуратора бронирования
     clear_home_page(driver)
 
-
+#TODO debug tests
 def test_save_changed_reservation(driver):
     add_and_save_1_res_str(driver)
 
@@ -632,7 +571,6 @@ def test_save_changed_reservation(driver):
                 EC.visibility_of_element_located((By.ID, field_id))
             )
             assert element.get_attribute('value') == expected_value, error_message
-# TODO вывести ошибки в отдельные переменные
     except TimeoutException:
         assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
     except AssertionError as ae:
@@ -653,6 +591,51 @@ def test_save_changed_reservation(driver):
     check_cancelling_reservation(driver)
 
     clear_home_page(driver)
+
+def test_adding_new_rate(driver):
+    get_link(driver)
+
+    open_rates(driver)
+
+    click_element(driver, By.ID, "__button8-inner") # Add new rate
+
+    sleep(8)
+
+    filling_rate_required_fields(driver)
+
+    click_element(driver, By.ID, "__button13-BDI-content") # Save
+
+    to_homepage(driver)
+
+    run_one_custom_res_string(
+        driver,
+        arrival_date=date.today().strftime("%d%m%Y"),
+        room_count=1,
+        adults=1,
+        children=0,
+        guest_category="RAC",
+        rate="1TEST1",
+        room_type="KING",
+        payment_info="VS 1111222233334444 0825",
+        guest_name=generate_guest_name(),
+        country="USA",
+        contact_name="BORIS",
+        booking_source="K"
+    )
+
+    open_rates(driver)
+
+    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
+
+    sleep(2)
+
+    click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
+
+    click_element(driver, By.ID, "__mbox-btn-2-BDI-content") # Access deleting
+
+    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
+
+    check_deleting_rate(driver)
 
 
 def hotkeys_alt_s_e_x(driver):
