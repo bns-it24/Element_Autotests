@@ -80,7 +80,7 @@ def add_new_res_string (driver):
 
 def select_hotel_1st_str(driver):
     click_element(driver, By.ID, "__select0-__xmlview2--homeMainTable-0-label")
-    click_element(driver, By.XPATH, "//*[text()='Hyatt Place Ekaterinburg']")
+    click_element(driver, By.ID, "__item2-__select0-__xmlview2--homeMainTable-0-1")
 
 
 def select_hotel_2nd_str(driver):
@@ -218,6 +218,14 @@ def filling_rate_required_fields(driver):
     click_multiple_elements(driver, element_ids)
 
 
+def filling_class_required_fields(driver):
+    send_keys_to_element(driver, By.ID, "__xmlview2--class_dialog_code-__xmlview2--class_manager-0-inner", "NtestN") # Rate class
+    send_keys_to_element(driver, By.ID,"__xmlview2--class_dialog_description-__xmlview2--class_manager-0-inner", "Test plus test") # Description
+    send_current_date(driver, "__xmlview2--class_dialog_begin_sell_date-__xmlview2--class_manager-0-inner") # Begin date
+    send_date_plus_12_months(driver, "__xmlview2--class_dialog_end_sell_date-__xmlview2--class_manager-0-inner") # End date
+    click_element(driver, By.ID, "__xmlview2--class_dialog_is_active-__xmlview2--class_manager-0-CbBg") # Active check-box
+
+
 def search_rate(driver, element_id, input_value, button_id):
     input_element = driver.find_element(By.ID, element_id)
     input_element.clear()
@@ -226,6 +234,13 @@ def search_rate(driver, element_id, input_value, button_id):
     button_element = driver.find_element(By.ID, button_id)
     ActionChains(driver).move_to_element(button_element).click().perform()
 
+def search_class(driver, element_id, input_value, button_id):
+    input_element = driver.find_element(By.ID, element_id)
+    input_element.clear()
+    input_element.send_keys(input_value)
+
+    button_element = driver.find_element(By.ID, button_id)
+    ActionChains(driver).move_to_element(button_element).click().perform()
 
 def save_reservation (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonSave")
@@ -314,17 +329,44 @@ def check_2nd_str_status_saved(driver):
     assert res_status_after_save == "SAVED", f"Expected SAVED, but got {res_status_after_save}"
 
 
-def check_deleting_rate(driver):
-    sleep(2)
-
-    body_text = driver.find_element(By.TAG_NAME, "body").text
+def check_saving_rate (driver):
     try:
-        if "1TEST1" in body_text:
-            raise AssertionError("ОШИБКА: тариф не был удален")
-        elif "No data loaded" in body_text:
-            print("Тариф корректно удален")
-    except AssertionError as e:
-        print(e)
+        success_message_element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate plan 1TEST1 saved successfully']"))
+        )
+        assert success_message_element.is_displayed(), "Сообщение об успешном сохранении не отображается."
+    except TimeoutException:
+        assert False, "Время ожидания истекло. Сообщение об успешном сохранении не обнаружено."
+
+
+def check_deleting_rate(driver):
+    try:
+        success_message_element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate plan 1TEST1 removed successfully']"))
+        )
+        assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
+    except TimeoutException:
+        assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
+
+
+def check_saving_class (driver):
+    try:
+        success_message_element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 saved successfully']"))
+        )
+        assert success_message_element.is_displayed(), "Сообщение об успешном сохранении не отображается."
+    except TimeoutException:
+        assert False, "Время ожидания истекло. Сообщение об успешном сохранении не обнаружено."
+
+
+def check_deleting_class(driver):
+    try:
+        success_message_element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 removed successfully']"))
+        )
+        assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
+    except TimeoutException:
+        assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
 
 
 def edit_mode_on (driver):
@@ -338,9 +380,35 @@ def open_rates(driver):
 
     click_element(driver, By.XPATH, "//*[text()='Rates']")
 
-    click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label") # обратить внимание на смену переменных "xmlview"
+    click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label")
 
     click_element(driver, By.ID, "__item11-__xmlview4--rate_search_hotel-1")
+
+
+def delete_rate(driver, rate_code):
+    search_rate(driver, "__xmlview4--rate_search_rate_code-inner", rate_code, "__button7-BDI-content")
+
+    click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
+
+    click_element(driver, By.ID, "__mbox-btn-2-BDI-content")  # Access deleting
+
+
+def open_classes(driver):
+    click_element(driver, By.ID, "__button0-internalBtn-BDI-content")
+
+    click_element(driver, By.XPATH, "//*[text()='Classes']")
+
+    click_element(driver, By.ID, "__xmlview4--rate_class_search_hotel-label")
+
+    click_element(driver, By.ID, "__item14-__xmlview4--rate_class_search_hotel-1")
+
+
+def delete_class(driver, rate_class):
+    search_class(driver, "__xmlview2--rate_class_search_code-inner", rate_class, "__xmlview2--rate_class_search_button-BDI-content")
+
+    click_element(driver, By.ID, "__button8-__clone5-img")  # Delete
+
+    click_element(driver, By.ID, "__mbox-btn-0-BDI-content")  # Access deleting
 
 
 def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
@@ -522,7 +590,25 @@ def run_three_res_strings(driver):
     # Очистка конфигуратора бронирования
     clear_home_page(driver)
 
+
 #TODO debug tests
+def test_add_rate_class(driver):
+    get_link(driver)
+
+    open_classes(driver)
+
+    click_element(driver, By.ID, "__button6-inner")  # Add new class
+
+    filling_class_required_fields(driver)
+
+    click_element(driver, By.ID, "__button12-BDI-content")  # Save
+
+    check_saving_class(driver)
+
+    #TODO где в клиенте фигурирует rate class?
+
+    delete_class(driver,"NtestN")
+
 def test_save_changed_reservation(driver):
     add_and_save_1_res_str(driver)
 
@@ -592,18 +678,22 @@ def test_save_changed_reservation(driver):
 
     clear_home_page(driver)
 
-def test_adding_new_rate(driver):
+def test_add_rate_plan(driver):
     get_link(driver)
 
     open_rates(driver)
 
     click_element(driver, By.ID, "__button8-inner") # Add new rate
 
-    sleep(8)
+    sleep(3)
 
     filling_rate_required_fields(driver)
 
     click_element(driver, By.ID, "__button13-BDI-content") # Save
+
+    check_saving_rate(driver)
+
+    sleep(2)
 
     to_homepage(driver)
 
@@ -625,15 +715,7 @@ def test_adding_new_rate(driver):
 
     open_rates(driver)
 
-    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
-
-    sleep(2)
-
-    click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
-
-    click_element(driver, By.ID, "__mbox-btn-2-BDI-content") # Access deleting
-
-    search_rate(driver,"__xmlview4--rate_search_rate_code-inner","1TEST1", "__button7-BDI-content")
+    delete_rate(driver, "1TEST1")
 
     check_deleting_rate(driver)
 
