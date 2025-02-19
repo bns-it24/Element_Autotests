@@ -219,11 +219,11 @@ def filling_rate_required_fields(driver):
 
 
 def filling_class_required_fields(driver):
-    send_keys_to_element(driver, By.ID, "__xmlview2--class_dialog_code-__xmlview2--class_manager-0-inner", "NtestN") # Rate class
-    send_keys_to_element(driver, By.ID,"__xmlview2--class_dialog_description-__xmlview2--class_manager-0-inner", "Test plus test") # Description
-    send_current_date(driver, "__xmlview2--class_dialog_begin_sell_date-__xmlview2--class_manager-0-inner") # Begin date
-    send_date_plus_12_months(driver, "__xmlview2--class_dialog_end_sell_date-__xmlview2--class_manager-0-inner") # End date
-    click_element(driver, By.ID, "__xmlview2--class_dialog_is_active-__xmlview2--class_manager-0-CbBg") # Active check-box
+    send_keys_to_element(driver, By.ID, "__xmlview4--class_dialog_code-__xmlview4--class_manager-0-inner", "NtestN") # Rate class
+    send_keys_to_element(driver, By.ID,"__xmlview4--class_dialog_description-__xmlview4--class_manager-0-inner", "Test plus test") # Description
+    send_current_date(driver, "__xmlview4--class_dialog_begin_sell_date-__xmlview4--class_manager-0-inner") # Begin date
+    send_date_plus_12_months(driver, "__xmlview4--class_dialog_end_sell_date-__xmlview4--class_manager-0-inner") # End date
+    click_element(driver, By.ID, "__xmlview4--class_dialog_is_active-__xmlview4--class_manager-0-CbBg") # Active check-box
 
 
 def search_rate(driver, element_id, input_value, button_id):
@@ -332,41 +332,56 @@ def check_2nd_str_status_saved(driver):
 def check_saving_rate (driver):
     try:
         success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate plan 1TEST1 saved successfully']"))
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 saved successfully']"))
         )
-        assert success_message_element.is_displayed(), "Сообщение об успешном сохранении не отображается."
+        assert success_message_element.is_displayed(), "\nСообщение об успешном сохранении не отображается."
+
     except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном сохранении не обнаружено."
+        print("\nВремя ожидания истекло. Сообщение об успешном сохранении не обнаружено.")
+        assert False
 
 
 def check_deleting_rate(driver):
     try:
         success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate plan 1TEST1 removed successfully']"))
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 removed successfully']"))
         )
-        assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
+        assert success_message_element.is_displayed(), "\nСообщение об успешном удалении не отображается."
+
     except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
+        print("\nВремя ожидания истекло. Сообщение об успешном удалении не обнаружено.")
+        assert False
 
 
-def check_saving_class (driver):
+def check_saving_class(driver):
     try:
         success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 saved successfully']"))
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class NtestN saved successfully']"))
         )
-        assert success_message_element.is_displayed(), "Сообщение об успешном сохранении не отображается."
+        assert success_message_element.is_displayed(), "\nСообщение об успешном сохранении не отображается."
+
     except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном сохранении не обнаружено."
+        print("\nВремя ожидания истекло. Сообщение об успешном сохранении не обнаружено.")
+        assert False
 
 
 def check_deleting_class(driver):
     try:
         success_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 removed successfully']"))
+            EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class NtestN removed successfully']"))
         )
-        assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
+        assert success_message_element.is_displayed(), "\nСообщение об успешном удалении не отображается."
+
     except TimeoutException:
-        assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
+        print("\nВремя ожидания истекло. Сообщение об успешном удалении не обнаружено.")
+        assert False
+    # try:
+    #     success_message_element = WebDriverWait(driver, 10).until(
+    #         EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 removed successfully']"))
+    #     )
+    #     assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
+    # except TimeoutException:
+    #     assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
 
 
 def edit_mode_on (driver):
@@ -390,7 +405,11 @@ def delete_rate(driver, rate_code):
 
     click_element(driver, By.ID, "__button10-__clone5-img")  # Delete
 
-    click_element(driver, By.ID, "__mbox-btn-2-BDI-content")  # Access deleting
+    element = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__mbox-btn-0-BDI-content"))
+    )
+    element.click() # костыль связан с перекрытием элемента, поэтому "EC.visibility_of_element..."
+
 
 
 def open_classes(driver):
@@ -400,15 +419,18 @@ def open_classes(driver):
 
     click_element(driver, By.ID, "__xmlview4--rate_class_search_hotel-label")
 
-    click_element(driver, By.ID, "__item14-__xmlview4--rate_class_search_hotel-1")
+    click_element(driver, By.ID, "__item11-__xmlview4--rate_class_search_hotel-1")
 
 
 def delete_class(driver, rate_class):
-    search_class(driver, "__xmlview2--rate_class_search_code-inner", rate_class, "__xmlview2--rate_class_search_button-BDI-content")
+    search_class(driver, "__xmlview4--rate_class_search_code-inner", rate_class, "__xmlview4--rate_class_search_button-content")
 
-    click_element(driver, By.ID, "__button8-__clone5-img")  # Delete
+    click_element(driver, By.ID, "__button9-__clone5-img")  # Delete
 
-    click_element(driver, By.ID, "__mbox-btn-0-BDI-content")  # Access deleting
+    element = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "__mbox-btn-0-BDI-content"))
+    )
+    element.click() # костыль связан с перекрытием элемента, поэтому "EC.visibility_of_element..."
 
 
 def run_one_custom_res_string(driver, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
@@ -597,7 +619,7 @@ def test_add_rate_class(driver):
 
     open_classes(driver)
 
-    click_element(driver, By.ID, "__button6-inner")  # Add new class
+    click_element(driver, By.ID, "__button7-img")  # Add new class
 
     filling_class_required_fields(driver)
 
@@ -608,6 +630,8 @@ def test_add_rate_class(driver):
     #TODO где в клиенте фигурирует rate class?
 
     delete_class(driver,"NtestN")
+
+    check_deleting_class(driver)
 
 def test_save_changed_reservation(driver):
     add_and_save_1_res_str(driver)
@@ -677,47 +701,6 @@ def test_save_changed_reservation(driver):
     check_cancelling_reservation(driver)
 
     clear_home_page(driver)
-
-def test_add_rate_plan(driver):
-    get_link(driver)
-
-    open_rates(driver)
-
-    click_element(driver, By.ID, "__button8-inner") # Add new rate
-
-    sleep(3)
-
-    filling_rate_required_fields(driver)
-
-    click_element(driver, By.ID, "__button13-BDI-content") # Save
-
-    check_saving_rate(driver)
-
-    sleep(2)
-
-    to_homepage(driver)
-
-    run_one_custom_res_string(
-        driver,
-        arrival_date=date.today().strftime("%d%m%Y"),
-        room_count=1,
-        adults=1,
-        children=0,
-        guest_category="RAC",
-        rate="1TEST1",
-        room_type="KING",
-        payment_info="VS 1111222233334444 0825",
-        guest_name=generate_guest_name(),
-        country="USA",
-        contact_name="BORIS",
-        booking_source="K"
-    )
-
-    open_rates(driver)
-
-    delete_rate(driver, "1TEST1")
-
-    check_deleting_rate(driver)
 
 
 def hotkeys_alt_s_e_x(driver):
@@ -1738,3 +1721,44 @@ def test_hotkeys():
             print(f"Ошибка при выполнении теста '{function.__name__}': {e}")
         finally:
             driver.quit()  # Закрытие сессии браузера (после каждого теста) независимо от результата
+
+def test_add_rate_plan(driver):
+    get_link(driver)
+
+    open_rates(driver)
+
+    click_element(driver, By.ID, "__button8-inner") # Add new rate
+
+    sleep(3)
+
+    filling_rate_required_fields(driver)
+
+    click_element(driver, By.ID, "__button13-BDI-content") # Save
+
+    check_saving_rate(driver)
+
+    sleep(2)
+
+    to_homepage(driver)
+
+    run_one_custom_res_string(
+        driver,
+        arrival_date=date.today().strftime("%d%m%Y"),
+        room_count=1,
+        adults=1,
+        children=0,
+        guest_category="RAC",
+        rate="1TEST1",
+        room_type="KING",
+        payment_info="VS 1111222233334444 0825",
+        guest_name=generate_guest_name(),
+        country="USA",
+        contact_name="BORIS",
+        booking_source="K"
+    )
+
+    open_rates(driver)
+
+    delete_rate(driver, "1TEST1")
+
+    check_deleting_rate(driver)
