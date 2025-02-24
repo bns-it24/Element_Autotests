@@ -10,7 +10,7 @@ from datetime import date
 import random
 import string
 from dateutil.relativedelta import relativedelta
-from tests.experimental_test import driver
+
 
 
 def click_element(driver, by, value):
@@ -613,7 +613,7 @@ def run_three_res_strings(driver):
     clear_home_page(driver)
 
 
-#TODO debug tests
+#TODO debug
 def test_add_rate_class(driver):
     get_link(driver)
 
@@ -701,6 +701,7 @@ def test_save_changed_reservation(driver):
     check_cancelling_reservation(driver)
 
     clear_home_page(driver)
+
 
 
 def hotkeys_alt_s_e_x(driver):

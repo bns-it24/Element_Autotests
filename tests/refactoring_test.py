@@ -12,7 +12,7 @@ import string
 from dateutil.relativedelta import relativedelta
 
 
-# Базовые функции, которые используются везде
+# Базовые функции, которые используются везде (=> base_actions)
 def click_element(driver, by, value):
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((by, value))).click()
 
@@ -50,7 +50,7 @@ def get_link(driver):
     driver.get("http://localhost:443/webapp/index.html#/home")
 
 
-# Функции, используемые на странице Home_Page
+# Функции, используемые на странице Home_Page (=> homepage)
 def add_new_res_string (driver):
     click_element(driver, By.ID, "__xmlview2--idHomeButtonAdd")
 
@@ -1303,23 +1303,23 @@ def hotkeys_ctrl_e_g_a(driver):
     click_element(driver, By.ID, "__button14-BDI-content")
 
 
-# Функции, связанные с проверкой функционала Rate_Management
+# Функции, связанные с проверкой функционала Rate_Management (rate_management => RateManagement)
 def open_rates(driver):
-    click_element(driver, By.ID, "__button0-internalBtn-BDI-content")
+    click_element(driver, By.ID, "__button0-internalBtn-BDI-content") # кнопка rate management
 
-    click_element(driver, By.XPATH, "//*[text()='Rates']")
+    click_element(driver, By.XPATH, "//*[text()='Rates']") # кнопка rates
 
-    click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label")
+    click_element(driver, By.ID, "__xmlview4--rate_search_hotel-label") # селектор отелей
 
-    click_element(driver, By.ID, "__item11-__xmlview4--rate_search_hotel-1")
+    click_element(driver, By.ID, "__item11-__xmlview4--rate_search_hotel-1") # кнопка "отель HPE"
 def open_classes(driver):
-    click_element(driver, By.ID, "__button0-internalBtn-BDI-content")
+    click_element(driver, By.ID, "__button0-internalBtn-BDI-content") # кнопка rate management
 
-    click_element(driver, By.XPATH, "//*[text()='Classes']")
+    click_element(driver, By.XPATH, "//*[text()='Classes']") # кнопка classes
 
-    click_element(driver, By.ID, "__xmlview4--rate_class_search_hotel-label")
+    click_element(driver, By.ID, "__xmlview4--rate_class_search_hotel-label") # селектор отелей
 
-    click_element(driver, By.ID, "__item11-__xmlview4--rate_class_search_hotel-1")
+    click_element(driver, By.ID, "__item11-__xmlview4--rate_class_search_hotel-1") # кнопка "отель HPE"
 
 def search_rate(driver, element_id, input_value, button_id):
     input_element = driver.find_element(By.ID, element_id)
@@ -1400,7 +1400,7 @@ def delete_class(driver, rate_class):
     element.click() # костыль связан с перекрытием элемента, поэтому "EC.visibility_of_element..."
 
 
-# Функции-проверки, которые тоже используются везде
+# Функции-проверки, которые используются на странице Home_Page (=> класс HomePageChecks в homepage)
 def check_adding_new_res_string(driver):
     try:
         # Ожидание, пока элемент станет видимым
@@ -1457,6 +1457,7 @@ def check_2nd_str_status_saved(driver):
     ).get_attribute('value')
     assert res_status_after_save == "SAVED", f"Expected SAVED, but got {res_status_after_save}"
 
+# Функции-проверки, которые используются на странице Rate_Management (=> класс RateManagementChecks в rate_management)
 def check_saving_rate (driver):
     try:
         success_message_element = WebDriverWait(driver, 10).until(
@@ -1498,13 +1499,7 @@ def check_deleting_class(driver):
     except TimeoutException:
         print("\nВремя ожидания истекло. Сообщение об успешном удалении не обнаружено.")
         assert False
-    # try:
-    #     success_message_element = WebDriverWait(driver, 10).until(
-    #         EC.visibility_of_element_located((By.XPATH, "//*[text()='The rate class 1TEST1 removed successfully']"))
-    #     )
-    #     assert success_message_element.is_displayed(), "Сообщение об успешном удалении не отображается."
-    # except TimeoutException:
-    #     assert False, "Время ожидания истекло. Сообщение об успешном удалении не обнаружено."
+
 
 
 
@@ -1538,7 +1533,6 @@ def test_add_rate_class(driver):
     delete_class(driver,"NtestN")
 
     check_deleting_class(driver)
-
 def test_save_changed_reservation(driver):
     add_and_save_1_res_str(driver)
 
@@ -1609,10 +1603,7 @@ def test_save_changed_reservation(driver):
     clear_home_page(driver)
 
 
-
-
-
-def test_onepage_res(driver):  # Проверка сохранения/удаления брони, типов оплаты
+def test_onepage_res(driver):
     get_link(driver)
     run_one_custom_res_string(
         driver,
@@ -1648,27 +1639,6 @@ def test_onepage_res(driver):  # Проверка сохранения/удал�
     )
 def test_multipage_reservation(driver):
     run_three_res_strings(driver)
-def test_hotkeys():
-    test_functions = [
-        hotkeys_alt_i,
-        hotkeys_alt_s_e_x,
-        hotkeys_alt_n_h,
-        hotkeys_alt_d_y,
-        hotkeys_alt_v,
-        hotkeys_alt_k,
-        hotkeys_ctrl_e_g_a
-    ]
-
-    for function in test_functions:
-        driver = webdriver.Chrome()  # Создание новой сессии браузера (после каждого теста)
-        driver.maximize_window()  # Включение полноэкранного отображения браузера
-        try:
-            function(driver)  # Вызов функции
-            print(f"Тест '{function.__name__}' прошел успешно.")
-        except Exception as e:  # Поймать любое исключение
-            print(f"Ошибка при выполнении теста '{function.__name__}': {e}")
-        finally:
-            driver.quit()  # Закрытие сессии браузера (после каждого теста) независимо от результата
 def test_add_rate_plan(driver):
     get_link(driver)
 
@@ -1709,3 +1679,25 @@ def test_add_rate_plan(driver):
     delete_rate(driver, "1TEST1")
 
     check_deleting_rate(driver)
+
+def test_hotkeys():
+    test_functions = [
+        hotkeys_alt_i,
+        hotkeys_alt_s_e_x,
+        hotkeys_alt_n_h,
+        hotkeys_alt_d_y,
+        hotkeys_alt_v,
+        hotkeys_alt_k,
+        hotkeys_ctrl_e_g_a
+    ]
+
+    for function in test_functions:
+        driver = webdriver.Chrome()  # Создание новой сессии браузера (после каждого теста)
+        driver.maximize_window()  # Включение полноэкранного отображения браузера
+        try:
+            function(driver)  # Вызов функции
+            print(f"Тест '{function.__name__}' прошел успешно.")
+        except Exception as e:  # Поймать любое исключение
+            print(f"Ошибка при выполнении теста '{function.__name__}': {e}")
+        finally:
+            driver.quit()  # Закрытие сессии браузера (после каждого теста) независимо от результата
