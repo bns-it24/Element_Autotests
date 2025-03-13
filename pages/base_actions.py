@@ -8,6 +8,7 @@ import string
 
 
 class BaseActions:
+
     def __init__(self, driver):
         self.driver = driver
 
@@ -45,5 +46,6 @@ class BaseActions:
     def to_homepage(self):
         self.click_element(By.ID, "__xmlview3--HOME-BDI-content")
 
-    def get_link(self, url):
+    def get_link(self):
+        url = "https://reserve.kube.ugmk.com/webapp/index.html#/home"
         self.driver.get(url)

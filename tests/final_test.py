@@ -98,7 +98,7 @@ def test_onepage_reservation(driver, reservation_data):
     logger.info(f"Запуск цикла бронирования для строки {reservation_data['row_index']}")
 
     logger.info("Открытие домашней страницы")
-    home_page.get_link("http://localhost:443/webapp/index.html#/home")
+    home_page.get_link()
 
     logger.info(f"Добавление и сохранение строки бронирования {reservation_data['row_index']}")
     home_page.run_custom_reservation(
@@ -261,4 +261,33 @@ def test_add_rate_class(driver):
         logger.error(f"ОШИБКА: {str(e)}")
         raise
 
+def test_reservation (driver):
+
+    home_page = HomePage(driver)
+    home_checks = HomePageChecks(driver)
+
+    logger.info(f"Запуск цикла бронирования для строки ['row_index = 1']")
+
+    logger.info("Открытие домашней страницы")
+    home_page.get_link()
+
+    logger.info(f"Добавление и сохранение строки бронирования ['row_index = 1']")
+    home_page.run_custom_reservation(
+        row_index= 1,
+        arrival_date= date.today().strftime("%d%m%Y"),
+        room_count= 1,
+        adults= 1,
+        children= 1,
+        guest_category= "AWD",
+        rate= "RACK",
+        room_type= "KING",
+        payment_info= "VS 1111222233334444 0825",
+        guest_name= "THIN/MARIA/MRS",
+        country= "USA",
+        contact_name= "BORIS",
+        booking_source= "K"
+    )
+    home_checks.check_reservation_status(row_index= 1, expected_status="NEW")
+    home_checks.check_saving_reservation()
+    home_checks.check_reservation_status(row_index=1, expected_status="SAVED")
 

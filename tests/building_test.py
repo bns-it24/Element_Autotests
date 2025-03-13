@@ -614,93 +614,93 @@ def run_three_res_strings(driver):
 
 
 #TODO debug
-def test_add_rate_class(driver):
-    get_link(driver)
-
-    open_classes(driver)
-
-    click_element(driver, By.ID, "__button7-img")  # Add new class
-
-    filling_class_required_fields(driver)
-
-    click_element(driver, By.ID, "__button12-BDI-content")  # Save
-
-    check_saving_class(driver)
-
-    #TODO где в клиенте фигурирует rate class?
-
-    delete_class(driver,"NtestN")
-
-    check_deleting_class(driver)
-
-def test_save_changed_reservation(driver):
-    add_and_save_1_res_str(driver)
-
-    check_saving_reservation(driver)
-
-    cnf_number_before = driver.find_element(By.ID, "__link0").text
-    print(f"Cnf nmb ДО выделения: {cnf_number_before}")
-
-    edit_mode_on(driver)
-
-    filling_required_fields_1st_str_custom(
-        driver,
-        arrival_date=date.today().strftime("%d%m%Y"),
-        room_count=3,
-        adults=4,
-        children=2,
-        guest_category="GTA",
-        rate="SWAG",
-        room_type="TWIN",
-        payment_info="CA",
-        guest_name="FILIPPI/GEORG/MR",
-        country="USA",
-        contact_name="TOMMY",
-        booking_source="T"
-    )
-
-    save_reservation(driver)
-
-    check_saving_reservation(driver)
-
-    fields_to_check = [
-        ("__input0-__xmlview2--homeMainTable-0-inner", 3, "Ошибка: поле 'Количество комнат' не было изменено."),
-        ("__input1-__xmlview2--homeMainTable-0-inner", 4, "Ошибка: поле 'Взрослые' не было изменено."),
-        ("__input2-__xmlview2--homeMainTable-0-inner", 1, "Ошибка: поле 'Дети' не было изменено."),
-        ("__input3-__xmlview2--homeMainTable-0-inner", "GTA", "Ошибка: поле 'Категория гостя' не было изменено."),
-        ("__input4-__xmlview2--homeMainTable-0-inner", "SWAG", "Ошибка: поле 'Тариф' не было изменено."),
-        ("__input5-__xmlview2--homeMainTable-0-inner", "TWIN", "Ошибка: поле 'Тип комнаты' не было изменено."),
-        ("__xmlview2--homeTabInputHold_G-inner", "CA", "Ошибка: поле 'Платежные данные' не было изменено."),
-        ("__xmlview2--homeTabInputName2_G-inner", "TOMMY", "Ошибка: поле 'Имя для связи' не было изменено."),
-        ("__xmlview2--homeTabInputBkngSrc_G-inner", "T", "Ошибка: поле 'Тип источника бронирования' не было изменено."),
-    ]
-
-    try:
-        for field_id, expected_value, error_message in fields_to_check:
-            element = WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, field_id))
-            )
-            assert element.get_attribute('value') == expected_value, error_message
-    except TimeoutException:
-        assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
-    except AssertionError as ae:
-        assert False, str(ae)
-
-    cnf_number_after = driver.find_element(By.ID, "__link0").text
-    print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
-
-    assert cnf_number_before == cnf_number_after, "Cnf nmb изменился"
-    print("Cnf номер подтвержден, значения совпадают.")
-
-    edit_mode_on(driver)
-
-    sleep(2)
-
-    cancel_1st_res_string(driver)
-
-    check_cancelling_reservation(driver)
-
-    clear_home_page(driver)
+# def test_add_rate_class(driver):
+#     get_link(driver)
+#
+#     open_classes(driver)
+#
+#     click_element(driver, By.ID, "__button7-img")  # Add new class
+#
+#     filling_class_required_fields(driver)
+#
+#     click_element(driver, By.ID, "__button12-BDI-content")  # Save
+#
+#     check_saving_class(driver)
+#
+#     #TODO где в клиенте фигурирует rate class?
+#
+#     delete_class(driver,"NtestN")
+#
+#     check_deleting_class(driver)
+#
+# def test_save_changed_reservation(driver):
+#     add_and_save_1_res_str(driver)
+#
+#     check_saving_reservation(driver)
+#
+#     cnf_number_before = driver.find_element(By.ID, "__link0").text
+#     print(f"Cnf nmb ДО выделения: {cnf_number_before}")
+#
+#     edit_mode_on(driver)
+#
+#     filling_required_fields_1st_str_custom(
+#         driver,
+#         arrival_date=date.today().strftime("%d%m%Y"),
+#         room_count=3,
+#         adults=4,
+#         children=2,
+#         guest_category="GTA",
+#         rate="SWAG",
+#         room_type="TWIN",
+#         payment_info="CA",
+#         guest_name="FILIPPI/GEORG/MR",
+#         country="USA",
+#         contact_name="TOMMY",
+#         booking_source="T"
+#     )
+#
+#     save_reservation(driver)
+#
+#     check_saving_reservation(driver)
+#
+#     fields_to_check = [
+#         ("__input0-__xmlview2--homeMainTable-0-inner", 3, "Ошибка: поле 'Количество комнат' не было изменено."),
+#         ("__input1-__xmlview2--homeMainTable-0-inner", 4, "Ошибка: поле 'Взрослые' не было изменено."),
+#         ("__input2-__xmlview2--homeMainTable-0-inner", 1, "Ошибка: поле 'Дети' не было изменено."),
+#         ("__input3-__xmlview2--homeMainTable-0-inner", "GTA", "Ошибка: поле 'Категория гостя' не было изменено."),
+#         ("__input4-__xmlview2--homeMainTable-0-inner", "SWAG", "Ошибка: поле 'Тариф' не было изменено."),
+#         ("__input5-__xmlview2--homeMainTable-0-inner", "TWIN", "Ошибка: поле 'Тип комнаты' не было изменено."),
+#         ("__xmlview2--homeTabInputHold_G-inner", "CA", "Ошибка: поле 'Платежные данные' не было изменено."),
+#         ("__xmlview2--homeTabInputName2_G-inner", "TOMMY", "Ошибка: поле 'Имя для связи' не было изменено."),
+#         ("__xmlview2--homeTabInputBkngSrc_G-inner", "T", "Ошибка: поле 'Тип источника бронирования' не было изменено."),
+#     ]
+#
+#     try:
+#         for field_id, expected_value, error_message in fields_to_check:
+#             element = WebDriverWait(driver, 10).until(
+#                 EC.visibility_of_element_located((By.ID, field_id))
+#             )
+#             assert element.get_attribute('value') == expected_value, error_message
+#     except TimeoutException:
+#         assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
+#     except AssertionError as ae:
+#         assert False, str(ae)
+#
+#     cnf_number_after = driver.find_element(By.ID, "__link0").text
+#     print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
+#
+#     assert cnf_number_before == cnf_number_after, "Cnf nmb изменился"
+#     print("Cnf номер подтвержден, значения совпадают.")
+#
+#     edit_mode_on(driver)
+#
+#     sleep(2)
+#
+#     cancel_1st_res_string(driver)
+#
+#     check_cancelling_reservation(driver)
+#
+#     clear_home_page(driver)
 
 
 
@@ -1763,3 +1763,92 @@ def test_add_rate_plan(driver):
     delete_rate(driver, "1TEST1")
 
     check_deleting_rate(driver)
+
+def test_add_rate_class(driver):
+        get_link(driver)
+
+        open_classes(driver)
+
+        click_element(driver, By.ID, "__button7-img")  # Add new class
+
+        filling_class_required_fields(driver)
+
+        click_element(driver, By.ID, "__button12-BDI-content")  # Save
+
+        check_saving_class(driver)
+
+        # TODO где в клиенте фигурирует rate class?
+
+        delete_class(driver, "NtestN")
+
+        check_deleting_class(driver)
+
+def test_save_changed_reservation(driver):
+        add_and_save_1_res_str(driver)
+
+        check_saving_reservation(driver)
+
+        cnf_number_before = driver.find_element(By.ID, "__link0").text
+        print(f"Cnf nmb ДО выделения: {cnf_number_before}")
+
+        edit_mode_on(driver)
+
+        filling_required_fields_1st_str_custom(
+            driver,
+            arrival_date=date.today().strftime("%d%m%Y"),
+            room_count=3,
+            adults=4,
+            children=2,
+            guest_category="GTA",
+            rate="SWAG",
+            room_type="TWIN",
+            payment_info="CA",
+            guest_name="FILIPPI/GEORG/MR",
+            country="USA",
+            contact_name="TOMMY",
+            booking_source="T"
+        )
+
+        save_reservation(driver)
+
+        check_saving_reservation(driver)
+
+        fields_to_check = [
+            ("__input0-__xmlview2--homeMainTable-0-inner", 3, "Ошибка: поле 'Количество комнат' не было изменено."),
+            ("__input1-__xmlview2--homeMainTable-0-inner", 4, "Ошибка: поле 'Взрослые' не было изменено."),
+            ("__input2-__xmlview2--homeMainTable-0-inner", 1, "Ошибка: поле 'Дети' не было изменено."),
+            ("__input3-__xmlview2--homeMainTable-0-inner", "GTA", "Ошибка: поле 'Категория гостя' не было изменено."),
+            ("__input4-__xmlview2--homeMainTable-0-inner", "SWAG", "Ошибка: поле 'Тариф' не было изменено."),
+            ("__input5-__xmlview2--homeMainTable-0-inner", "TWIN", "Ошибка: поле 'Тип комнаты' не было изменено."),
+            ("__xmlview2--homeTabInputHold_G-inner", "CA", "Ошибка: поле 'Платежные данные' не было изменено."),
+            ("__xmlview2--homeTabInputName2_G-inner", "TOMMY", "Ошибка: поле 'Имя для связи' не было изменено."),
+            ("__xmlview2--homeTabInputBkngSrc_G-inner", "T",
+             "Ошибка: поле 'Тип источника бронирования' не было изменено."),
+        ]
+
+        try:
+            for field_id, expected_value, error_message in fields_to_check:
+                element = WebDriverWait(driver, 10).until(
+                    EC.visibility_of_element_located((By.ID, field_id))
+                )
+                assert element.get_attribute('value') == expected_value, error_message
+        except TimeoutException:
+            assert False, "Время ожидания истекло. Вводимое значение не обнаружено."
+        except AssertionError as ae:
+            assert False, str(ae)
+
+        cnf_number_after = driver.find_element(By.ID, "__link0").text
+        print(f"Cnf nmb ПОСЛЕ выделения: {cnf_number_after}")
+
+        assert cnf_number_before == cnf_number_after, "Cnf nmb изменился"
+        print("Cnf номер подтвержден, значения совпадают.")
+
+        edit_mode_on(driver)
+
+        sleep(2)
+
+        cancel_1st_res_string(driver)
+
+        check_cancelling_reservation(driver)
+
+        clear_home_page(driver)

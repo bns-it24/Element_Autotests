@@ -1,10 +1,10 @@
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from base_actions import BaseActions
 from tests.final_test import logger
+from pages.base_actions import BaseActions
+from selenium.webdriver.common.by import By
 
 
 class HomePage(BaseActions):
@@ -69,12 +69,10 @@ class HomePage(BaseActions):
         body = self.driver.find_element(By.TAG_NAME, "body")
         body.send_keys(Keys.ALT, 'e')
 
-    def run_custom_reservation(self, row_index, arrival_date, room_count, adults, children, guest_category, rate,
-                              room_type, payment_info, guest_name, country, contact_name, booking_source):
+    def run_custom_reservation(self, row_index, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source):
         self.add_new_res_string()
         self.select_hotel(row_index)
-        self.fill_required_fields(row_index, arrival_date, room_count, adults, children, guest_category, rate, room_type,
-                                 payment_info, guest_name, country, contact_name, booking_source)
+        self.fill_required_fields(row_index, arrival_date, room_count, adults, children, guest_category, rate, room_type, payment_info, guest_name, country, contact_name, booking_source)
         self.save_reservation()
         self.edit_mode_on()
         self.cancel_reservation(row_index)
